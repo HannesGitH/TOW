@@ -38,6 +38,7 @@ android {
     }
 
     defaultConfig {
+        multiDexEnabled true
         applicationId "games.hannepps.tow"
         minSdkVersion 16
         targetSdkVersion 28
@@ -62,6 +63,7 @@ flutter {
 dependencies {
     def multidex_version = "2.0.1"
     implementation "androidx.multidex:multidex:$multidex_version"
+    implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.google.firebase:firebase-analytics:17.2.2'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     testImplementation 'junit:junit:4.12'

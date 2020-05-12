@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "357679294958",
+    "firebase_url": "https://tugofwartow.firebaseio.com",
+    "project_id": "tugofwartow",
+    "storage_bucket": "tugofwartow.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:357679294958:android:df7e3ad8897d99332646ff",
+        "android_client_info": {
+          "package_name": "games.hannepps.tow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "357679294958-09nnj2d8vg2q5vaunal41uc99jqc46eh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHfeqjZtVFhbQTGXN9Xs7e7phjh2dzoNY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "357679294958-09nnj2d8vg2q5vaunal41uc99jqc46eh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

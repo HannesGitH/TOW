@@ -19,6 +19,7 @@ environment:
 dependencies:
   flutter_svg:
   shared_preferences:
+  firebase_database:
   cloud_firestore: ^0.12.9+5
   flutter:
     sdk: flutter

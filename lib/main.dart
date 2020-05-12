@@ -1,5 +1,6 @@
 import 'dart:math';
-
+import 'package:firebase_database/firebase_database.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,10 +18,12 @@ class MyApp extends StatelessWidget {
       title: 'TOW Worldwide',
       darkTheme: ThemeData(
         primaryColor: team1_color,
+        primaryColorBrightness: Brightness.light,
         accentColor: team1_color,
       ),
       theme: ThemeData(
         primaryColor: team2_color,
+        primaryColorBrightness: Brightness.light,
         accentColor: team2_color,
       ),
       home: MyHomePage(title: 'TOW : TugOfWar Worldwide'),
@@ -57,12 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
         if (snap.data == 0) {
           return TeamChoose();
         }
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(widget.title),
-          ),
-          body: Text("you shouldn't be here"),
-        );
+        return Fighter(team:snap.data,title:widget.title,);
       },
     );
   }
@@ -125,6 +123,78 @@ class TeamButton extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class Fighter extends StatefulWidget {
+  int team;
+  final String title;
+  Color _color;
+  Fighter({this.team,this.title}){
+    this._color=(team==1)?team1_color:team2_color;
+  }
+  @override
+  _FighterState createState() => _FighterState();
+}
+
+class _FighterState extends State<Fighter> {
+  final dbr = FirebaseDatabase.instance.reference();
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Color c = widget._color;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+        backgroundColor: c,
+        centerTitle: true,
+      ),
+      body: StreamBuilder(
+        //initialData: dbr.once(),
+      stream: dbr.onValue,
+      builder: (BuildContext context, AsyncSnapshot<Event> snapshot) {
+        int team1=0;
+        int team2=0;
+        if(snapshot.connectionState==ConnectionState.active||snapshot.connectionState==ConnectionState.done){
+          DataSnapshot s = snapshot.data.snapshot;
+          team1=s.value['team1'];
+          team2=s.value['team2'];
+        }
+
+        return Container(
+          height:MediaQuery.of(context).size.height,
+          child:Column(
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: 
+                <Widget>[
+                  Text((team1).toString(),style: TextStyle(fontSize:30),),
+                  Text((team2).toString(),style: TextStyle(fontSize:30),),
+                ],
+              ),
+              FloatingActionButton(
+                child: Icon(Icons.add),
+                onPressed: (){
+                  print("pressed");
+                  dbr.child('team${widget.team}').runTransaction((transaction){
+                    int old = transaction.value;
+                    print("old: $old");
+                    dbr.child('team${widget.team}').set(old + 1);
+                    return;
+                  });
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    ),
     );
   }
 }

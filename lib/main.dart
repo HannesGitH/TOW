@@ -45,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<int> getTeam() async {
     //return 0;//only to debug
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return (await prefs.getInt('team'))??0;
+    return (await prefs.getInt('team')) ?? 0;
   }
 
   @override
@@ -60,7 +60,10 @@ class _MyHomePageState extends State<MyHomePage> {
         if (snap.data == 0) {
           return TeamChoose();
         }
-        return Fighter(team:snap.data,title:widget.title,);
+        return Fighter(
+          team: snap.data,
+          title: widget.title,
+        );
       },
     );
   }
@@ -105,16 +108,22 @@ class TeamButton extends StatelessWidget {
         padding: EdgeInsets.all(40),
         child: RaisedButton(
           elevation: 14,
-          shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(30),),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
           color: team == 1 ? team1_color : team2_color,
           onPressed: () {
             _setTeam(team);
             runApp(MyApp());
           },
-          child:  Padding(
+          child: Padding(
             padding: EdgeInsets.all(40),
             child: Transform(
-              transform: team==1?Matrix4.identity():(Matrix4.identity()..rotateY(pi)..translate(-200.0,0,0)),
+              transform: team == 1
+                  ? Matrix4.identity()
+                  : (Matrix4.identity()
+                    ..rotateY(pi)
+                    ..translate(-200.0, 0, 0)),
               child: SvgPicture.asset(
                 'assets/tugger.svg',
                 color: Colors.black54,
@@ -131,8 +140,8 @@ class Fighter extends StatefulWidget {
   int team;
   final String title;
   Color _color;
-  Fighter({this.team,this.title}){
-    this._color=(team==1)?team1_color:team2_color;
+  Fighter({this.team, this.title}) {
+    this._color = (team == 1) ? team1_color : team2_color;
   }
   @override
   _FighterState createState() => _FighterState();
@@ -156,45 +165,88 @@ class _FighterState extends State<Fighter> {
       ),
       body: StreamBuilder(
         //initialData: dbr.once(),
-      stream: dbr.onValue,
-      builder: (BuildContext context, AsyncSnapshot<Event> snapshot) {
-        int team1=0;
-        int team2=0;
-        if(snapshot.connectionState==ConnectionState.active||snapshot.connectionState==ConnectionState.done){
-          DataSnapshot s = snapshot.data.snapshot;
-          team1=s.value['team1'];
-          team2=s.value['team2'];
-        }
+        stream: dbr.onValue,
+        builder: (BuildContext context, AsyncSnapshot<Event> snapshot) {
+          int team1 = 0;
+          int team2 = 0;
+          if (snapshot.connectionState == ConnectionState.active ||
+              snapshot.connectionState == ConnectionState.done) {
+            DataSnapshot s = snapshot.data.snapshot;
+            team1 = s.value['team1'];
+            team2 = s.value['team2'];
+          }
 
-        return Container(
-          height:MediaQuery.of(context).size.height,
-          child:Column(
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: 
-                <Widget>[
-                  Text((team1).toString(),style: TextStyle(fontSize:30),),
-                  Text((team2).toString(),style: TextStyle(fontSize:30),),
-                ],
+          return Container(
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      (team1).toString(),
+                      style: TextStyle(fontSize: 30),
+                    ),
+                    Text(
+                      (team2).toString(),
+                      style: TextStyle(fontSize: 30),
+                    ),
+                  ],
+                ),
+                Rope(percent:(team1/(team1+team2))*100),
+                FloatingActionButton(
+                  child: Icon(Icons.add),
+                  onPressed: () {
+                    print("pressed");
+                    dbr
+                        .child('team${widget.team}')
+                        .runTransaction((transaction) {
+                      int old = transaction.value;
+                      print("old: $old");
+                      dbr.child('team${widget.team}').set(old + 1);
+                      return;
+                    });
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class Rope extends StatelessWidget {
+  double percent;
+  Rope({this.percent = 50});
+
+  @override
+  Widget build(BuildContext context) {
+    print(percent);
+    return Container(
+      child: Padding(
+        padding: EdgeInsets.all(20),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Stack(alignment: Alignment.centerLeft, children: [
+            FractionallySizedBox(
+              widthFactor: 1,
+              child: Container(
+                height: 40,
+                color: team2_color,
               ),
-              FloatingActionButton(
-                child: Icon(Icons.add),
-                onPressed: (){
-                  print("pressed");
-                  dbr.child('team${widget.team}').runTransaction((transaction){
-                    int old = transaction.value;
-                    print("old: $old");
-                    dbr.child('team${widget.team}').set(old + 1);
-                    return;
-                  });
-                },
+            ),
+            FractionallySizedBox(
+              widthFactor: percent / 100,
+              child: Container(
+                height: 40,
+                color: team1_color,
               ),
-            ],
-          ),
-        );
-      },
-    ),
+            ),
+          ]),
+        ),
+      ),
     );
   }
 }

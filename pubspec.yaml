@@ -1,5 +1,5 @@
-name: tow
-description: A new Flutter project.
+name: TOW
+description: Tug Of War Worldwide
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -17,6 +17,8 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
+  flutter_svg:
+  shared_preferences:
   cloud_firestore: ^0.12.9+5
   flutter:
     sdk: flutter
@@ -40,7 +42,8 @@ flutter_icons:
 
 # The following section is specific to Flutter.
 flutter:
-
+  assets:
+    - assets/
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

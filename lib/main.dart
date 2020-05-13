@@ -154,12 +154,66 @@ class _FighterState extends State<Fighter> {
     super.initState();
   }
 
+  bool _isdown = false;
+  
+    int team1=1;
+    int team2=1;
+
   @override
   Widget build(BuildContext context) {
     Color c = widget._color;
+
+    Widget towButton = Padding(
+      padding: EdgeInsets.only(
+        left: widget.team == 1 ? 100 + (_isdown ? 20.0 : 0.0) : 0,
+        right: widget.team == 1 ? 0 : 100 + (_isdown ? 20.0 : 0.0),
+        bottom: 100,
+      ),
+      child: RaisedButton(
+        shape: CircleBorder(),
+        color: c,
+        child: Container(
+          child: Transform(
+            transform: widget.team == 1
+                ? Matrix4.identity()
+                : (Matrix4.identity()
+                  ..rotateY(pi)
+                  ..translate(-200.0, 0, 0)),
+            child: SvgPicture.asset(
+              'assets/tugger.svg',
+              color: Colors.black54,
+            ),
+          ),
+          height: 100,
+          width: 100,
+        ),
+        onHighlightChanged: (bool down) {
+          setState(() {
+            _isdown = down;
+          });
+        },
+        onPressed: () {
+          print("pressed");
+          try {
+            dbr.child('team${widget.team}').runTransaction((transaction) {
+              int old = transaction.value;
+              print("old: $old");
+              dbr.child('team${widget.team}').set(old + 1);
+              return;
+            });
+          } catch (Exception) {}
+        },
+      ),
+    );
+
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(
+          widget.title,
+          style:
+              TextStyle(color: widget.team == 1 ? Colors.white : Colors.black),
+        ),
         backgroundColor: c,
         centerTitle: true,
       ),
@@ -167,8 +221,6 @@ class _FighterState extends State<Fighter> {
         //initialData: dbr.once(),
         stream: dbr.onValue,
         builder: (BuildContext context, AsyncSnapshot<Event> snapshot) {
-          int team1 = 0;
-          int team2 = 0;
           if (snapshot.connectionState == ConnectionState.active ||
               snapshot.connectionState == ConnectionState.done) {
             DataSnapshot s = snapshot.data.snapshot;
@@ -179,35 +231,30 @@ class _FighterState extends State<Fighter> {
           return Container(
             height: MediaQuery.of(context).size.height,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Column(
                   children: <Widget>[
-                    Text(
-                      (team1).toString(),
-                      style: TextStyle(fontSize: 30),
+                    Padding(
+                      padding: EdgeInsets.only(left: 30, right: 30, top: 40),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            (team1).toString(),
+                            style: TextStyle(fontSize: 15, color: team1_color),
+                          ),
+                          Text(
+                            (team2).toString(),
+                            style: TextStyle(fontSize: 15, color: team2_color),
+                          ),
+                        ],
+                      ),
                     ),
-                    Text(
-                      (team2).toString(),
-                      style: TextStyle(fontSize: 30),
-                    ),
+                    Rope(percent: (team1 / (team1 + team2)) * 100),
                   ],
                 ),
-                Rope(percent:(team1/(team1+team2))*100),
-                FloatingActionButton(
-                  child: Icon(Icons.add),
-                  onPressed: () {
-                    print("pressed");
-                    dbr
-                        .child('team${widget.team}')
-                        .runTransaction((transaction) {
-                      int old = transaction.value;
-                      print("old: $old");
-                      dbr.child('team${widget.team}').set(old + 1);
-                      return;
-                    });
-                  },
-                ),
+                towButton,
               ],
             ),
           );
@@ -227,24 +274,29 @@ class Rope extends StatelessWidget {
     return Container(
       child: Padding(
         padding: EdgeInsets.all(20),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Stack(alignment: Alignment.centerLeft, children: [
-            FractionallySizedBox(
-              widthFactor: 1,
-              child: Container(
-                height: 40,
-                color: team2_color,
-              ),
+        child: Column(
+          children: <Widget>[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Stack(alignment: Alignment.centerLeft, children: [
+                FractionallySizedBox(
+                  widthFactor: 1,
+                  child: Container(
+                    height: 40,
+                    color: team2_color,
+                  ),
+                ),
+                FractionallySizedBox(
+                  widthFactor: percent / 100,
+                  child: Container(
+                    height: 40,
+                    color: team1_color,
+                  ),
+                ),
+              ]),
             ),
-            FractionallySizedBox(
-              widthFactor: percent / 100,
-              child: Container(
-                height: 40,
-                color: team1_color,
-              ),
-            ),
-          ]),
+            Icon(Icons.keyboard_arrow_up),
+          ],
         ),
       ),
     );

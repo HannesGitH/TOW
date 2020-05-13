@@ -1,4 +1,4 @@
-package com.example.tow
+package games.hannepps.tow
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

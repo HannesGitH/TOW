@@ -43,7 +43,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   ///0: none; 1:blue; 2:red
   Future<int> getTeam() async {
-    //return 0;//only to debug
+    //return 2;//only to debug
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return (await prefs.getInt('team')) ?? 0;
   }
@@ -178,7 +178,7 @@ class _FighterState extends State<Fighter> {
                 ? Matrix4.identity()
                 : (Matrix4.identity()
                   ..rotateY(pi)
-                  ..translate(-200.0, 0, 0)),
+                  ..translate(-100.0, 0, 0)),
             child: SvgPicture.asset(
               'assets/tugger.svg',
               color: Colors.black54,

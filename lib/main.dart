@@ -165,16 +165,16 @@ class _FighterState extends State<Fighter> {
 
     Widget towButton = Padding(
       padding: EdgeInsets.only(
-        left: widget.team == 1 ? 100 + (_isdown ? 20.0 : 0.0) : 0,
-        right: widget.team == 1 ? 0 : 100 + (_isdown ? 20.0 : 0.0),
+        left: widget.team == 1 ? 100 + (_isdown ? 20.0 : 10.0) : 10,
+        right: widget.team == 1 ? 10 : 100 + (_isdown ? 20.0 :10.0),
         bottom: 100,
       ),
       child: RaisedButton(
-        shape: CircleBorder(),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         color: c,
-        child: Container(
-          child: Transform(
-            transform: widget.team == 1
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 100),
+          transform: widget.team == 1
                 ? Matrix4.identity()
                 : (Matrix4.identity()
                   ..rotateY(pi)
@@ -183,9 +183,6 @@ class _FighterState extends State<Fighter> {
               'assets/tugger.svg',
               color: Colors.black54,
             ),
-          ),
-          height: 100,
-          width: 100,
         ),
         onHighlightChanged: (bool down) {
           setState(() {
@@ -254,7 +251,7 @@ class _FighterState extends State<Fighter> {
                     Rope(percent: (team1 / (team1 + team2)) * 100),
                   ],
                 ),
-                towButton,
+                Expanded(child: towButton),
               ],
             ),
           );
